@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f0e4">
-  <meta name="description" content="走过三十个江湖情境，看看你与哪位燕云故人的处事方式最相近。">
+  <meta name="description" content="回答三十道日常情境题，看看你与哪位燕云故人的处事方式最相近。">
   <title>燕云故人｜燕云十六声人物匹配</title>
   <link rel="stylesheet" href="./assets/css/site.css?v=3">
-  <script defer src="./assets/js/questions.js?v=3"></script>
+  <script defer src="./assets/js/questions.js?v=4"></script>
   <script defer src="./assets/js/characters.js"></script>
   <script defer src="./assets/js/readouts.js"></script>
-  <script defer src="./assets/js/app.js?v=3"></script>
+  <script defer src="./assets/js/app.js?v=4"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -24,7 +24,7 @@
         <p class="eyebrow"><span class="index-mark">壹</span> 江湖人物匹配</p>
         <h1 id="home-title" tabindex="-1">燕云<span>故人</span></h1>
         <p class="lead">行过同一座山，<br>你会作出谁的选择？</p>
-        <p class="intro">从不羡仙的一杯酒，到未央城的一笔交易。走过三十个江湖情境，看看你与哪位故人的处事方式最相近。</p>
+        <p class="intro">用三十道日常情境题，看看你与哪位燕云故人的处事方式最相近。</p>
         <div class="actions"><button class="primary" id="start">入卷答题 <span aria-hidden="true">→</span></button><span class="muted">约 5–7 分钟</span></div>
         <div class="stats"><span><b>34</b> 位故人</span><span><b>30</b> 道情境</span><span><b>6</b> 项倾向</span></div>
       </div>
@@ -43,11 +43,11 @@
       <button class="primary" id="begin">进入第一题 <span aria-hidden="true">→</span></button>
     </section>
     <section id="quiz" class="quiz" hidden aria-labelledby="question">
-      <div class="toolbar"><button class="quiet" id="exit">← 返回首页</button><span class="eyebrow">江湖见闻</span></div>
+      <div class="toolbar"><button class="quiet" id="exit">← 返回首页</button><span class="eyebrow">日常情境</span></div>
       <div class="progress-copy"><span id="counter"></span><span id="percent"></span></div>
       <progress id="progress" max="30" value="0" aria-label="答题进度"></progress>
       <div class="question-grid">
-        <aside class="scene"><span id="question-index" class="eyebrow"></span><p id="scene"></p></aside>
+        <aside class="scene"><span id="question-index" class="eyebrow"></span></aside>
         <form id="quiz-form">
           <h1 id="question" tabindex="-1"></h1>
           <fieldset id="options"><legend class="sr-only">选择最接近你的做法</legend></fieldset>

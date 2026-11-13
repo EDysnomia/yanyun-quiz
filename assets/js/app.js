@@ -5,7 +5,7 @@
   const readouts = window.YanyunReadouts;
   const axes = [
     ["担责", "守好本分", "主动补位"],
-    ["人情", "先照顾眼前的人", "先稳住整体"],
+    ["人情", "主动回应对方", "先观察，给对方留空间"],
     ["时机", "先查清再动", "边行动边确认"],
     ["规矩", "遵循原约", "随情势调整"],
     ["合作", "独立推进", "共同商议"],
@@ -13,13 +13,14 @@
   ];
   const axisExamples = [
     ["人手突然不够时，先把自己的事做稳，再让负责的人安排。", "遇到没人接手的事，会主动问自己能帮到哪一步。", "会看自己手头忙不忙、缺口有多大，再决定接多少。"],
-    ["有人跟不上时，会先问那个人遇到了什么难处。", "资源不够时，会先保证大多数人还有办法继续。", "会先弄清谁最急，再看帮一个人会不会拖住大家。"],
+    ["察觉朋友不对劲时，通常会主动问问，或直接提出能给的帮助。", "察觉朋友不对劲时，通常会先给对方一点空间，等他愿意说。", "会看对方是否愿意开口，再决定问一句还是先陪着。"],
     ["消息还不清楚时，愿意多花点时间核实。", "时间紧时，会先做一件能推进局面的事，再补信息。", "会先做个容易收回的小尝试，再决定要不要继续。"],
     ["改动会影响别人的安排时，会先确认原来的约定还能不能履行。", "遇到临时变化，会按眼前的需要调整办法，再解释原因。", "会先留住约定里最重要的部分，小处再商量。"],
     ["意见很多时，习惯先自己理一遍，再拿出办法。", "会早点把人拉进来，让各自知道能帮哪一块。", "往往会先拿个初步想法出来，再请熟悉的人补充。"],
     ["机会再好，也会先确认失败了还能怎么办。", "觉得机会难得时，愿意承担一部分没法预先算清的代价。", "愿意试，但会给自己定一个能承受的损失上限。"]
   ];
-  const storageKey = "yanyun-quiz-v1";
+  const storageKey = "yanyun-quiz-marvel-v1";
+  const normalize = (score) => 50 + 25 * score;
   const get = (id) => document.getElementById(id);
   const set = (id, value) => { get(id).textContent = value; };
   const screens = { home: "home-title", intro: "intro-title", quiz: "question", result: "hero-name" };
@@ -61,30 +62,26 @@
   }
 
   function renderQuestion() {
-    const [axis, scene, prompt, ...choices] = questions[position];
-    set("scene", scene);
+    const { prompt, options } = questions[position];
     set("question", prompt);
     set("counter", `第 ${position + 1} / ${questions.length} 题`);
     set("question-index", "问卷 · " + String(position + 1).padStart(2, "0"));
     updateProgress();
     const fieldset = get("options");
     fieldset.querySelectorAll(".option").forEach((option) => option.remove());
-    // Rotate the four options to vary the position of each scoring direction.
-    const offset = (Math.floor(position / axes.length) + axis) % 4;
-    for (let index = 0; index < choices.length; index++) {
-      const value = (index + offset) % choices.length;
+    for (let index = 0; index < options.length; index++) {
       const label = document.createElement("label");
       label.className = "option";
       const input = document.createElement("input");
       input.type = "radio";
       input.name = "answer";
-      input.value = value;
-      input.checked = answers[position] === value;
+      input.value = index;
+      input.checked = answers[position] === index;
       const letter = document.createElement("span");
       letter.className = "option-letter";
       letter.setAttribute("aria-hidden", "true");
       letter.textContent = "ABCD"[index];
-      label.append(input, letter, document.createTextNode(choices[value]));
+      label.append(input, letter, document.createTextNode(options[index].text));
       fieldset.append(label);
     }
     get("previous").disabled = position === 0;
@@ -102,11 +99,14 @@
   function profile() {
     const totals = axes.map(() => 0);
     const counts = axes.map(() => 0);
-    questions.forEach(([axis], index) => {
-      totals[axis] += answers[index] * (100 / 3);
-      counts[axis]++;
+    questions.forEach(({ options }, index) => {
+      options[answers[index]].scores.forEach((score, axis) => {
+        if (score === null) return;
+        totals[axis] += score;
+        counts[axis]++;
+      });
     });
-    return totals.map((total, axis) => total / counts[axis]);
+    return totals.map((total, axis) => normalize(counts[axis] ? total / counts[axis] : 0));
   }
 
   function rank(user) {
@@ -149,17 +149,18 @@
   }
 
   function renderAnswerExample(axis, user) {
-    const sample = questions.reduce((best, question, index) => {
-      if (question[0] !== axis) return best;
-      const gap = Math.abs(answers[index] * (100 / 3) - user[axis]);
-      return !best || gap < best.gap ? { index, gap } : best;
-    }, null);
-    const [,, prompt, ...choices] = questions[sample.index];
-    const repeated = questions.filter((question, index) =>
-      question[0] === axis && band(answers[index] * (100 / 3)) === band(user[axis])
-    ).length;
-    const context = repeated >= 3 ? `同类的 5 道题里，你有 ${repeated} 道选了相近的做法。` : "这一题展示了你在这种场景里的选择。";
-    set("answer-example", `${prompt} 你选了「${choices[answers[sample.index]].replace(/。$/, "")}」。${context}`);
+    const samples = questions.flatMap(({ prompt, options }, index) => {
+      const { text, scores } = options[answers[index]];
+      return scores[axis] === null ? [] : [{ prompt, text, value: normalize(scores[axis]) }];
+    });
+    const sample = samples.sort((a, b) => Math.abs(a.value - user[axis]) - Math.abs(b.value - user[axis]))[0];
+    if (!sample) {
+      set("answer-example", "本次答案在这项倾向上的信息较少，可结合六维图一起看。");
+      return;
+    }
+    const repeated = samples.filter(({ value }) => band(value) === band(user[axis])).length;
+    const context = repeated >= 3 ? `在计入这项倾向的 ${samples.length} 道题里，你有 ${repeated} 道选了相近的做法。` : "";
+    set("answer-example", `${sample.prompt} 你选了「${sample.text.replace(/。$/, "")}」。${context}`);
   }
 
   function renderReadout(id, match, user, count) {
