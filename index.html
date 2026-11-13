@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./assets/css/site.css">
   <script defer src="./assets/js/questions.js"></script>
   <script defer src="./assets/js/characters.js"></script>
+  <script defer src="./assets/js/readouts.js"></script>
   <script defer src="./assets/js/app.js"></script>
 </head>
 <body>
@@ -20,28 +21,33 @@
   <main class="shell" id="main" tabindex="-1">
     <section id="home" class="cover" aria-labelledby="home-title">
       <div class="cover-copy">
-        <p class="eyebrow">江湖人物匹配</p>
+        <p class="eyebrow"><span class="index-mark">壹</span> 江湖人物匹配</p>
         <h1 id="home-title" tabindex="-1">燕云<span>故人</span></h1>
         <p class="lead">行过同一座山，<br>你会作出谁的选择？</p>
         <p class="intro">从不羡仙的一杯酒，到未央城的一笔交易。走过三十个江湖情境，看看你与哪位故人的处事方式最相近。</p>
         <div class="actions"><button class="primary" id="start">入卷答题 <span aria-hidden="true">→</span></button><span class="muted">约 5–7 分钟</span></div>
         <div class="stats"><span><b>34</b> 位故人</span><span><b>30</b> 道情境</span><span><b>6</b> 项倾向</span></div>
       </div>
-      <figure class="cover-art"><img src="./assets/images/jianghu.webp" alt="戴斗笠的旅人立于山崖，远望云雾中的江河" fetchpriority="high"><figcaption>山河远阔，故人有期。</figcaption></figure>
+      <figure class="cover-art"><div class="art-orbit" aria-hidden="true"></div><div class="art-window"><img src="./assets/images/jianghu.webp" alt="戴斗笠的旅人立于山崖，远望云雾中的江河" fetchpriority="high"></div><figcaption>山河远阔<br>故人有期</figcaption></figure>
+      <p class="cover-note">答案保存在当前浏览器。结果呈现你本次作答与人物画像的相似程度。</p>
     </section>
     <section id="intro" class="reading panel" hidden aria-labelledby="intro-title">
       <button class="quiet" id="intro-back">← 返回首页</button>
-      <p class="eyebrow">开卷之前</p>
-      <h1 id="intro-title" tabindex="-1">凭你的第一反应作答</h1>
-      <p>每题选一个最接近你平时做法的选项。题目只需要看眼前的情境，没玩过游戏也能作答。</p>
-      <p>作答后会看到主匹配、副匹配和六维对照。进度保存在当前浏览器。</p>
+      <p class="eyebrow"><span class="index-mark">贰</span> 开卷之前</p>
+      <h1 id="intro-title" tabindex="-1">凭你的<br><em>第一反应作答。</em></h1>
+      <div class="intro-cards">
+        <article><h2>按平时作答</h2><p>每题选一个最接近你平时做法的选项。没玩过游戏也能作答。</p></article>
+        <article><h2>随时续答</h2><p>进度保存在当前浏览器，刷新或退出后都可以继续。</p></article>
+        <article><h2>看见两种侧面</h2><p>作答后会看到主匹配、副匹配，以及你与人物的六维对照。</p></article>
+      </div>
       <button class="primary" id="begin">进入第一题 <span aria-hidden="true">→</span></button>
     </section>
     <section id="quiz" class="quiz" hidden aria-labelledby="question">
-      <div class="toolbar"><button class="quiet" id="exit">← 返回首页</button><span id="counter" class="muted"></span></div>
+      <div class="toolbar"><button class="quiet" id="exit">← 返回首页</button><span class="eyebrow">江湖见闻</span></div>
+      <div class="progress-copy"><span id="counter"></span><span id="percent"></span></div>
       <progress id="progress" max="30" value="0" aria-label="答题进度"></progress>
       <div class="question-grid">
-        <aside class="scene"><span class="eyebrow">行旅所见</span><p id="scene"></p></aside>
+        <aside class="scene"><span id="question-index" class="eyebrow"></span><p id="scene"></p></aside>
         <form id="quiz-form">
           <h1 id="question" tabindex="-1"></h1>
           <fieldset id="options"><legend class="sr-only">选择最接近你的做法</legend></fieldset>
@@ -50,41 +56,51 @@
       </div>
     </section>
     <section id="result" hidden aria-labelledby="hero-name">
-      <div class="toolbar"><p class="eyebrow">你的江湖档案</p><button class="quiet" id="result-home">返回首页</button></div>
+      <div class="toolbar"><p class="eyebrow"><span class="index-mark">叁</span> 你的江湖档案</p><button class="quiet" id="result-home">返回首页</button></div>
       <article class="poster">
         <div class="poster-copy">
           <p id="hero-region" class="eyebrow"></p>
           <h1 id="hero-name" tabindex="-1"></h1>
-          <p id="hero-line" class="lead"></p>
           <p><strong id="hero-score" class="score"></strong> 综合匹配度</p>
+          <blockquote id="hero-line" class="lead"></blockquote>
+          <p id="hero-story" class="poster-story"></p>
         </div>
         <div class="poster-art" aria-hidden="true"></div>
       </article>
+      <header class="section-heading"><p class="eyebrow">六维对照</p><h2>你们的相似，<em>藏在每一次取舍里。</em></h2></header>
       <div class="result-grid">
         <article class="panel">
-          <h2>为何与你相似</h2>
-          <p id="hero-story"></p>
-          <h3>你的处事侧面</h3>
-          <p id="hero-trait"></p>
-          <h3>可能遇到的难处</h3>
-          <p id="hero-limit"></p>
-        </article>
-        <article class="panel">
-          <h2>六维对照</h2>
+          <h3>六维画像</h3>
           <p class="legend"><span>你的倾向（实线）</span><span>人物画像（虚线）</span></p>
           <div id="radar"></div>
           <dl id="dimensions" class="dimensions"></dl>
         </article>
+        <article class="panel">
+          <p class="eyebrow">主匹配分析</p>
+          <h3 id="report-title"></h3>
+          <p id="hero-trait"></p>
+          <p id="hero-readout"></p>
+          <div id="hero-axes" class="axis-readout"></div>
+          <h3>可能遇到的难处</h3>
+          <p id="hero-limit"></p>
+          <p id="hero-difference" class="difference"></p>
+        </article>
       </div>
+      <header class="section-heading"><p class="eyebrow">副匹配</p><h2>你的另一种<em>江湖侧面。</em></h2></header>
       <article class="panel secondary">
-        <p class="eyebrow">副匹配 · <span id="second-region"></span></p>
-        <div class="toolbar"><h2 id="second-name"></h2><strong class="score" id="second-score"></strong></div>
-        <p class="lead" id="second-line"></p>
-        <p id="second-trait"></p>
-        <p id="second-angle" class="muted"></p>
-        <details><summary>查看副匹配六维相似度</summary><dl id="second-dimensions" class="dimensions"></dl></details>
+        <div class="secondary-heading"><p class="eyebrow" id="second-region"></p><h3 id="second-name"></h3><p><strong class="score" id="second-score"></strong> 综合匹配度</p></div>
+        <div class="secondary-body">
+          <blockquote class="lead" id="second-line"></blockquote>
+          <p id="second-story"></p>
+          <p id="second-trait"></p>
+          <p id="second-readout"></p>
+          <div id="second-axes" class="axis-readout"></div>
+          <details><summary>展开六维对照</summary><div id="second-radar"></div><dl id="second-dimensions" class="dimensions"></dl></details>
+        </div>
       </article>
+      <p id="second-angle" class="compare-strip"></p>
       <div class="actions result-actions"><button class="primary" id="share">下载结果卡</button><button class="quiet" id="retake">重新测试</button><span id="status" role="status"></span></div>
+      <p class="result-note">综合匹配度为六项相似度的平均值。人物画像为同人解读，结果仅供娱乐。</p>
     </section>
     <noscript><p>请启用 JavaScript 后开始测试。</p></noscript>
   </main>

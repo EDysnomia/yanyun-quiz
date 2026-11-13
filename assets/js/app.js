@@ -2,6 +2,7 @@
   "use strict";
   const questions = window.YanyunQuestions;
   const characters = window.YanyunCharacters;
+  const readouts = window.YanyunReadouts;
   const axes = [
     ["担责", "守好本分", "主动补位"],
     ["人情", "先照顾眼前的人", "先稳住整体"],
@@ -56,7 +57,8 @@
     set("scene", scene);
     set("question", prompt);
     set("counter", `第 ${position + 1} / ${questions.length} 题`);
-    get("progress").value = answers.filter((answer) => answer !== null).length;
+    set("question-index", "问卷 · " + String(position + 1).padStart(2, "0"));
+    updateProgress();
     const fieldset = get("options");
     fieldset.querySelectorAll(".option").forEach((option) => option.remove());
     // Rotate the four options to vary the position of each scoring direction.
@@ -70,13 +72,23 @@
       input.name = "answer";
       input.value = value;
       input.checked = answers[position] === value;
-      label.append(input, document.createTextNode(choices[value]));
+      const letter = document.createElement("span");
+      letter.className = "option-letter";
+      letter.setAttribute("aria-hidden", "true");
+      letter.textContent = "ABCD"[index];
+      label.append(input, letter, document.createTextNode(choices[value]));
       fieldset.append(label);
     }
     get("previous").disabled = position === 0;
     get("next").disabled = answers[position] === null;
     set("next", position === questions.length - 1 ? "查看结果 →" : "下一题 →");
     show("quiz");
+  }
+
+  function updateProgress() {
+    const count = answers.filter((answer) => answer !== null).length;
+    get("progress").value = count;
+    set("percent", Math.round(count / questions.length * 100) + "%");
   }
 
   function profile() {
@@ -101,7 +113,7 @@
     return axes.map((_, axis) => axis).sort((a, b) => match.similarity[b] - match.similarity[a]);
   }
 
-  function renderRadar(user, hero) {
+  function renderRadar(id, user, hero) {
     const point = (axis, value) => {
       const angle = axis * Math.PI / 3 - Math.PI / 2;
       return [175 + 86 * value * Math.cos(angle), 119 + 86 * value * Math.sin(angle)];
@@ -112,9 +124,28 @@
       const [x, y] = point(axis, 1.22);
       return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="#20322c" font-size="13">${label}</text>`;
     }).join("");
-    get("radar").innerHTML = `<svg viewBox="0 0 350 238" role="img" aria-label="六项处事倾向对照图">${rings}
+    get(id).innerHTML = `<svg viewBox="0 0 350 238" role="img" aria-label="六项处事倾向对照图，你的画像用实线，人物画像用虚线">${rings}
       <polygon points="${polygon(user)}" fill="#29473e27" stroke="#29473e" stroke-width="2.5"/>
       <polygon points="${polygon(hero)}" fill="none" stroke="#8b392c" stroke-width="2.5" stroke-dasharray="5 4"/>${labels}</svg>`;
+  }
+
+  function describe(axis, value) {
+    const [, left, right] = axes[axis];
+    if (value < 38) return `偏向「${left}」`;
+    if (value > 62) return `偏向「${right}」`;
+    return `会在「${left}」与「${right}」之间视情况取舍`;
+  }
+
+  function renderReadout(id, match, user, count) {
+    get(id).replaceChildren(...closest(match).slice(0, count).map((axis) => {
+      const paragraph = document.createElement("p");
+      const label = document.createElement("strong");
+      label.textContent = `${axes[axis][0]} · ${Math.round(match.similarity[axis])}%`;
+      const you = describe(axis, user[axis]);
+      const them = describe(axis, match.values[axis]);
+      paragraph.append(label, you === them ? `你们都${you}。` : `你${you}；${match.name}${them}。`);
+      return paragraph;
+    }));
   }
 
   function renderDimensions(id, match, user) {
@@ -141,20 +172,34 @@
     set("hero-line", main.line);
     set("hero-score", Math.round(main.average) + "%");
     set("hero-story", main.story);
-    const mainAxes = closest(main);
-    set("hero-trait", `你们在「${axes[mainAxes[0]][0]}」和「${axes[mainAxes[1]][0]}」上最接近。${main.trait}`);
+    set("report-title", `为什么你像${main.name}？`);
+    set("hero-trait", main.trait);
+    set("hero-readout", readouts[main.name]);
+    renderReadout("hero-axes", main, user, 3);
     set("hero-limit", main.limit);
-    renderRadar(user, main.values);
+    const gap = closest(main).at(-1);
+    const difference = main.similarity[gap] < 85;
+    get("hero-difference").hidden = !difference;
+    set("hero-difference", difference ? `你们差异最大的一项是「${axes[gap][0]}」。你${describe(gap, user[gap])}，${main.name}${describe(gap, main.values[gap])}（你的倾向 ${Math.round(user[gap])}，人物画像 ${main.values[gap]}）。` : "");
+    renderRadar("radar", user, main.values);
     renderDimensions("dimensions", main, user);
     set("second-name", second.name);
     set("second-region", second.region);
     set("second-line", second.line);
     set("second-score", Math.round(second.average) + "%");
     const secondAxes = closest(second);
-    set("second-trait", `你与${second.name}最接近的是「${axes[secondAxes[0]][0]}」和「${axes[secondAxes[1]][0]}」。${second.trait}`);
+    set("second-story", second.story);
+    set("second-trait", second.trait);
+    set("second-readout", readouts[second.name]);
+    renderReadout("second-axes", second, user, 2);
     const distinctive = secondAxes.find((axis) => second.similarity[axis] > main.similarity[axis] + 0.01);
-    set("second-angle", distinctive === undefined ? second.limit : `与主匹配相比，你在「${axes[distinctive][0]}」上更接近${second.name}。`);
+    const mainLead = axes[closest(main)[0]][0];
+    const secondLead = axes[secondAxes[0]][0];
+    set("second-angle", distinctive === undefined ?
+      `你与${main.name}最相似的一项是「${mainLead}」，与${second.name}最相似的一项是「${secondLead}」。${second.limit}` :
+      `你与${main.name}最相似的一项是「${mainLead}」。在「${axes[distinctive][0]}」上，你与${second.name}的画像更接近。${second.limit}`);
     renderDimensions("second-dimensions", second, user);
+    renderRadar("second-radar", user, second.values);
     get("result").querySelector("details").open = false;
     set("status", "");
     show("result");
@@ -231,7 +276,7 @@
     if (event.target.name !== "answer") return;
     answers[position] = Number(event.target.value);
     get("next").disabled = false;
-    get("progress").value = answers.filter((answer) => answer !== null).length;
+    updateProgress();
     save();
   });
   get("quiz-form").addEventListener("submit", (event) => {

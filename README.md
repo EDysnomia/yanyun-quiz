@@ -20,6 +20,7 @@ assets/
   css/site.css          响应式排版与视觉样式
   js/questions.js       题干、选项、场景与计分维度
   js/characters.js      人物档案、原创题签与六维画像
+  js/readouts.js        34 位人物各自的处事场景分析
   js/app.js             答题、续答、匹配、雷达图和 PNG 导出
   images/jianghu.webp    原创水墨插画
 ```
