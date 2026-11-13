@@ -11,6 +11,14 @@
     ["合作", "独立推进", "共同商议"],
     ["风险", "留足退路", "接受不确定性"]
   ];
+  const axisExamples = [
+    ["人手突然不够时，先把自己的事做稳，再让负责的人安排。", "遇到没人接手的事，会主动问自己能帮到哪一步。", "会看自己手头忙不忙、缺口有多大，再决定接多少。"],
+    ["有人跟不上时，会先问那个人遇到了什么难处。", "资源不够时，会先保证大多数人还有办法继续。", "会先弄清谁最急，再看帮一个人会不会拖住大家。"],
+    ["消息还不清楚时，愿意多花点时间核实。", "时间紧时，会先做一件能推进局面的事，再补信息。", "会先做个容易收回的小尝试，再决定要不要继续。"],
+    ["改动会影响别人的安排时，会先确认原来的约定还能不能履行。", "遇到临时变化，会按眼前的需要调整办法，再解释原因。", "会先留住约定里最重要的部分，小处再商量。"],
+    ["意见很多时，习惯先自己理一遍，再拿出办法。", "会早点把人拉进来，让各自知道能帮哪一块。", "往往会先拿个初步想法出来，再请熟悉的人补充。"],
+    ["机会再好，也会先确认失败了还能怎么办。", "觉得机会难得时，愿意承担一部分没法预先算清的代价。", "愿意试，但会给自己定一个能承受的损失上限。"]
+  ];
   const storageKey = "yanyun-quiz-v1";
   const get = (id) => document.getElementById(id);
   const set = (id, value) => { get(id).textContent = value; };
@@ -136,6 +144,24 @@
     return `会在「${left}」与「${right}」之间视情况取舍`;
   }
 
+  function band(value) {
+    return value < 38 ? 0 : value > 62 ? 1 : 2;
+  }
+
+  function renderAnswerExample(axis, user) {
+    const sample = questions.reduce((best, question, index) => {
+      if (question[0] !== axis) return best;
+      const gap = Math.abs(answers[index] * (100 / 3) - user[axis]);
+      return !best || gap < best.gap ? { index, gap } : best;
+    }, null);
+    const [,, prompt, ...choices] = questions[sample.index];
+    const repeated = questions.filter((question, index) =>
+      question[0] === axis && band(answers[index] * (100 / 3)) === band(user[axis])
+    ).length;
+    const context = repeated >= 3 ? `同类的 5 道题里，你有 ${repeated} 道选了相近的做法。` : "这一题展示了你在这种场景里的选择。";
+    set("answer-example", `${prompt} 你选了「${choices[answers[sample.index]].replace(/。$/, "")}」。${context}`);
+  }
+
   function renderReadout(id, match, user, count) {
     get(id).replaceChildren(...closest(match).slice(0, count).map((axis) => {
       const paragraph = document.createElement("p");
@@ -143,7 +169,8 @@
       label.textContent = `${axes[axis][0]} · ${Math.round(match.similarity[axis])}%`;
       const you = describe(axis, user[axis]);
       const them = describe(axis, match.values[axis]);
-      paragraph.append(label, you === them ? `你们都${you}。` : `你${you}；${match.name}${them}。`);
+      const example = axisExamples[axis][band(user[axis])];
+      paragraph.append(label, you === them ? `你们都${you}。${example}` : `你${you}，${match.name}${them}。从你的答案看，${example}`);
       return paragraph;
     }));
   }
@@ -175,12 +202,13 @@
     set("report-title", `为什么你像${main.name}？`);
     set("hero-trait", main.trait);
     set("hero-readout", readouts[main.name]);
+    renderAnswerExample(closest(main)[0], user);
     renderReadout("hero-axes", main, user, 3);
     set("hero-limit", main.limit);
     const gap = closest(main).at(-1);
     const difference = main.similarity[gap] < 85;
     get("hero-difference").hidden = !difference;
-    set("hero-difference", difference ? `你们差异最大的一项是「${axes[gap][0]}」。你${describe(gap, user[gap])}，${main.name}${describe(gap, main.values[gap])}（你的倾向 ${Math.round(user[gap])}，人物画像 ${main.values[gap]}）。` : "");
+    set("hero-difference", difference ? `你们差异最大的一项是「${axes[gap][0]}」。从分数看，你比${main.name}更偏向「${axes[gap][user[gap] > main.values[gap] ? 2 : 1]}」。遇到类似的事，你可能会在这一步做出不同选择。` : "");
     renderRadar("radar", user, main.values);
     renderDimensions("dimensions", main, user);
     set("second-name", second.name);

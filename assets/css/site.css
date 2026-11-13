@@ -168,6 +168,10 @@ progress { height: 4px; margin: 8px 0 clamp(22px, 5vw, 42px); }
 .difference, .compare-strip { color: var(--muted); }
 .secondary { display: grid; grid-template-columns: minmax(0, .64fr) minmax(0, 1fr); gap: clamp(18px, 5vw, 60px); }
 .secondary-heading { padding: 20px; background: #e8ebdf; border: 1px solid var(--line); align-content: center; text-align: center; }
+.secondary-heading { position: relative; isolation: isolate; min-height: 240px; align-self: start; display: grid; place-items: center; color: #fff5df; background: linear-gradient(150deg, #20382fba, #20382fed), url("../images/jianghu.webp") 58% 72%/cover; border-color: #344e41; }
+.secondary-heading::before { content: ""; position: absolute; inset: 9px; border: 1px solid #ffecd357; pointer-events: none; }
+.secondary-heading .eyebrow, .secondary-heading .score { color: #ffd4a0; }
+.answer-example { border-left: 2px solid var(--red); padding: 8px 12px; background: #f1e8d7; }
 .secondary-heading #second-name { font: 700 clamp(2rem, 5vw, 4.4rem)/1.15 var(--serif); margin-block: 10px 14px; overflow-wrap: anywhere; }
 .secondary blockquote { background: #f1e8d7; margin-top: 0; }
 .compare-strip { padding: 12px 14px; border-block: 1px solid var(--line); margin-top: 12px; }
