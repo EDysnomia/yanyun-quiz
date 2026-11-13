@@ -3,6 +3,7 @@
   const questions = window.YanyunQuestions;
   const characters = window.YanyunCharacters;
   const readouts = window.YanyunReadouts;
+  const portraits = window.YanyunPortraits;
   const axes = [
     ["担责", "守好本分", "主动补位"],
     ["人情", "主动回应对方", "先观察，给对方留空间"],
@@ -191,10 +192,20 @@
     });
   }
 
+  function setPortrait(id, name) {
+    const portrait = get(id);
+    portrait.onerror = () => { portrait.hidden = true; };
+    portrait.alt = name + "的水墨画像";
+    portrait.src = "./assets/images/portraits/" + portraits[name] + ".webp";
+    portrait.hidden = false;
+  }
+
   function renderResult() {
     const user = profile();
     const [main, second] = rank(user);
     currentResult = { main, second };
+    setPortrait("hero-portrait", main.name);
+    setPortrait("second-portrait", second.name);
     set("hero-name", main.name);
     set("hero-region", main.region);
     set("hero-line", main.line);
@@ -259,6 +270,30 @@
       gradient.addColorStop(1, "#29473e00");
       ctx.fillStyle = gradient;
       ctx.fillRect(650, 0, 145, 650);
+      const portrait = get("hero-portrait");
+      try {
+        if (!portrait.complete) await portrait.decode();
+        if (!portrait.naturalWidth) throw new Error("画像未加载");
+        const crop = Math.min(portrait.naturalWidth, portrait.naturalHeight * 440 / 650);
+        const height = crop * 650 / 440;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(760, 0);
+        ctx.lineTo(1080, 0);
+        ctx.lineTo(1080, 650);
+        ctx.lineTo(640, 650);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(portrait, (portrait.naturalWidth - crop) / 2, (portrait.naturalHeight - height) * .3, crop, height, 640, 0, 440, 650);
+        const ink = ctx.createLinearGradient(650, 0, 835, 28);
+        ink.addColorStop(0, "#29473e");
+        ink.addColorStop(1, "#29473e00");
+        ctx.fillStyle = ink;
+        ctx.fillRect(640, 0, 440, 650);
+        ctx.restore();
+      } catch {
+        // Keep the landscape card available when a portrait cannot be loaded.
+      }
       ctx.fillStyle = "#fff5df";
       ctx.font = "25px Microsoft YaHei, sans-serif";
       ctx.fillText("燕云故人   /   江湖人物匹配", 60, 76);

@@ -21,8 +21,10 @@ assets/
   js/questions.js       题干、选项、场景与计分维度
   js/characters.js      人物档案、原创题签与六维画像
   js/readouts.js        34 位人物各自的处事场景分析
+  js/portraits.js       人物与画像文件的对应关系
   js/app.js             答题、续答、匹配、雷达图和 PNG 导出
   images/jianghu.webp    原创水墨插画
+  images/portraits/      角色水墨同人画像
 ```
 
 题干和选项顺序沿用原版。每个选项可以影响多个维度，用户画像按各维有效分数的平均值计算。人物画像按这套题库的分值重新校准，匹配度是六个维度的接近程度取平均。换题前后的答案使用独立存储。
@@ -35,3 +37,5 @@ assets/
 - 青州、江南与未央城参考[青州见闻](https://yy16s.huijiwiki.com/wiki/见闻/青州)、[江南见闻](https://yy16s.huijiwiki.com/wiki/见闻/江南)、[江南主线文本](https://yy16s.huijiwiki.com/wiki/最忆江南)、[未央城主题介绍](https://www.yysls.cn/news/official/20261012/37780_1316330.html)和[人物传记录屏](https://www.bilibili.com/video/BV1YzXXYrETE/)。
 
 燕云题签与人物数值画像为测试创作。游戏名称、角色与设定归原权利方所有。
+
+人物画像使用内置图像生成工具绘制。提示词采用「单人竖幅半身像、以角色发型和服饰等特征为线索、宣纸水墨与低饱和矿物色、淡山雾、无文字」；部分角色另以官方图标作造型参考。

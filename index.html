@@ -6,11 +6,12 @@
   <meta name="theme-color" content="#f5f0e4">
   <meta name="description" content="回答三十道日常情境题，看看你与哪位燕云故人的处事方式最相近。">
   <title>燕云故人｜燕云十六声人物匹配</title>
-  <link rel="stylesheet" href="./assets/css/site.css?v=5">
+  <link rel="stylesheet" href="./assets/css/site.css?v=6">
   <script defer src="./assets/js/questions.js?v=4"></script>
   <script defer src="./assets/js/characters.js"></script>
   <script defer src="./assets/js/readouts.js"></script>
-  <script defer src="./assets/js/app.js?v=4"></script>
+  <script defer src="./assets/js/portraits.js"></script>
+  <script defer src="./assets/js/app.js?v=6"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -66,6 +67,7 @@
           <p id="hero-story" class="poster-story"></p>
         </div>
         <div class="poster-art" aria-hidden="true"></div>
+        <div class="portrait-panel"><img id="hero-portrait" alt="" hidden></div>
       </article>
       <header class="section-heading"><p class="eyebrow">六维对照</p><h2>你们的相似，<em>藏在每一次取舍里。</em></h2></header>
       <div class="result-grid">
@@ -95,6 +97,7 @@
           <p class="eyebrow" id="second-region"></p>
           <h3 id="second-name"></h3>
           <p><strong class="score" id="second-score"></strong> 综合匹配度</p>
+          <div class="portrait-panel"><img id="second-portrait" alt="" hidden></div>
         </div>
         <div class="secondary-body">
           <blockquote class="lead" id="second-line"></blockquote>
