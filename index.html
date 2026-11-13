@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f0e4">
+  <meta name="description" content="走过三十个江湖情境，看看你与哪位燕云故人的处事方式最相近。">
+  <title>燕云故人｜燕云十六声人物匹配</title>
+  <link rel="stylesheet" href="./assets/css/site.css">
+  <script defer src="./assets/js/questions.js"></script>
+  <script defer src="./assets/js/characters.js"></script>
+  <script defer src="./assets/js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="shell header">
+    <button class="brand" id="home-link" aria-label="燕云故人，返回首页"><span class="seal" aria-hidden="true">燕</span> 燕云故人</button>
+    <span class="header-note">《燕云十六声》同人测试</span>
+  </header>
+  <main class="shell" id="main" tabindex="-1">
+    <section id="home" class="cover" aria-labelledby="home-title">
+      <div class="cover-copy">
+        <p class="eyebrow">江湖人物匹配</p>
+        <h1 id="home-title" tabindex="-1">燕云<span>故人</span></h1>
+        <p class="lead">行过同一座山，<br>你会作出谁的选择？</p>
+        <p class="intro">从不羡仙的一杯酒，到未央城的一笔交易。走过三十个江湖情境，看看你与哪位故人的处事方式最相近。</p>
+        <div class="actions"><button class="primary" id="start">入卷答题 <span aria-hidden="true">→</span></button><span class="muted">约 5–7 分钟</span></div>
+        <div class="stats"><span><b>34</b> 位故人</span><span><b>30</b> 道情境</span><span><b>6</b> 项倾向</span></div>
+      </div>
+      <figure class="cover-art"><img src="./assets/images/jianghu.webp" alt="戴斗笠的旅人立于山崖，远望云雾中的江河" fetchpriority="high"><figcaption>山河远阔，故人有期。</figcaption></figure>
+    </section>
+    <section id="intro" class="reading panel" hidden aria-labelledby="intro-title">
+      <button class="quiet" id="intro-back">← 返回首页</button>
+      <p class="eyebrow">开卷之前</p>
+      <h1 id="intro-title" tabindex="-1">凭你的第一反应作答</h1>
+      <p>每题选一个最接近你平时做法的选项。题目只需要看眼前的情境，没玩过游戏也能作答。</p>
+      <p>作答后会看到主匹配、副匹配和六维对照。进度保存在当前浏览器。</p>
+      <button class="primary" id="begin">进入第一题 <span aria-hidden="true">→</span></button>
+    </section>
+    <section id="quiz" class="quiz" hidden aria-labelledby="question">
+      <div class="toolbar"><button class="quiet" id="exit">← 返回首页</button><span id="counter" class="muted"></span></div>
+      <progress id="progress" max="30" value="0" aria-label="答题进度"></progress>
+      <div class="question-grid">
+        <aside class="scene"><span class="eyebrow">行旅所见</span><p id="scene"></p></aside>
+        <form id="quiz-form">
+          <h1 id="question" tabindex="-1"></h1>
+          <fieldset id="options"><legend class="sr-only">选择最接近你的做法</legend></fieldset>
+          <div class="toolbar quiz-actions"><button type="button" class="quiet" id="previous">← 上一题</button><button type="submit" class="primary" id="next" disabled>下一题 →</button></div>
+        </form>
+      </div>
+    </section>
+    <section id="result" hidden aria-labelledby="hero-name">
+      <div class="toolbar"><p class="eyebrow">你的江湖档案</p><button class="quiet" id="result-home">返回首页</button></div>
+      <article class="poster">
+        <div class="poster-copy">
+          <p id="hero-region" class="eyebrow"></p>
+          <h1 id="hero-name" tabindex="-1"></h1>
+          <p id="hero-line" class="lead"></p>
+          <p><strong id="hero-score" class="score"></strong> 综合匹配度</p>
+        </div>
+        <div class="poster-art" aria-hidden="true"></div>
+      </article>
+      <div class="result-grid">
+        <article class="panel">
+          <h2>为何与你相似</h2>
+          <p id="hero-story"></p>
+          <h3>你的处事侧面</h3>
+          <p id="hero-trait"></p>
+          <h3>可能遇到的难处</h3>
+          <p id="hero-limit"></p>
+        </article>
+        <article class="panel">
+          <h2>六维对照</h2>
+          <p class="legend"><span>你的倾向（实线）</span><span>人物画像（虚线）</span></p>
+          <div id="radar"></div>
+          <dl id="dimensions" class="dimensions"></dl>
+        </article>
+      </div>
+      <article class="panel secondary">
+        <p class="eyebrow">副匹配 · <span id="second-region"></span></p>
+        <div class="toolbar"><h2 id="second-name"></h2><strong class="score" id="second-score"></strong></div>
+        <p class="lead" id="second-line"></p>
+        <p id="second-trait"></p>
+        <p id="second-angle" class="muted"></p>
+        <details><summary>查看副匹配六维相似度</summary><dl id="second-dimensions" class="dimensions"></dl></details>
+      </article>
+      <div class="actions result-actions"><button class="primary" id="share">下载结果卡</button><button class="quiet" id="retake">重新测试</button><span id="status" role="status"></span></div>
+    </section>
+    <noscript><p>请启用 JavaScript 后开始测试。</p></noscript>
+  </main>
+  <footer class="shell footer"><span>燕云故人</span><span>同人创作 · 结果仅供娱乐</span></footer>
+</body>
+</html>
