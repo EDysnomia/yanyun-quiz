@@ -21,6 +21,7 @@
     ["机会再好，也会先确认失败了还能怎么办。", "觉得机会难得时，愿意承担一部分没法预先算清的代价。", "愿意试，但会给自己定一个能承受的损失上限。"]
   ];
   const storageKey = "yanyun-quiz-marvel-v1";
+  const portraitPreferenceKey = "yanyun-show-portraits";
   const normalize = (score) => 50 + 25 * score;
   const get = (id) => document.getElementById(id);
   const set = (id, value) => { get(id).textContent = value; };
@@ -28,6 +29,14 @@
   let answers = Array(questions.length).fill(null);
   let position = 0;
   let currentResult;
+  let showPortraits = false;
+  const portraitSwitches = document.querySelectorAll("[data-portrait-switch]");
+
+  try {
+    showPortraits = localStorage.getItem(portraitPreferenceKey) === "true";
+  } catch {
+    // The setting can still be changed for this visit.
+  }
 
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
@@ -200,12 +209,20 @@
     portrait.hidden = false;
   }
 
+  function applyPortraitPreference() {
+    portraitSwitches.forEach((input) => { input.checked = showPortraits; });
+    get("result").classList.toggle("landscape-only", !showPortraits);
+    if (showPortraits && currentResult) {
+      setPortrait("hero-portrait", currentResult.main.name);
+      setPortrait("second-portrait", currentResult.second.name);
+    }
+  }
+
   function renderResult() {
     const user = profile();
     const [main, second] = rank(user);
     currentResult = { main, second };
-    setPortrait("hero-portrait", main.name);
-    setPortrait("second-portrait", second.name);
+    applyPortraitPreference();
     set("hero-name", main.name);
     set("hero-region", main.region);
     set("hero-line", main.line);
@@ -250,6 +267,7 @@
     button.disabled = true;
     try {
       const { main, second } = currentResult;
+      const includePortrait = showPortraits;
       const canvas = document.createElement("canvas");
       canvas.width = 1080;
       canvas.height = 650;
@@ -272,25 +290,27 @@
       ctx.fillRect(650, 0, 145, 650);
       const portrait = get("hero-portrait");
       try {
-        if (!portrait.complete) await portrait.decode();
-        if (!portrait.naturalWidth) throw new Error("画像未加载");
-        const crop = Math.min(portrait.naturalWidth, portrait.naturalHeight * 440 / 650);
-        const height = crop * 650 / 440;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(760, 0);
-        ctx.lineTo(1080, 0);
-        ctx.lineTo(1080, 650);
-        ctx.lineTo(640, 650);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(portrait, (portrait.naturalWidth - crop) / 2, (portrait.naturalHeight - height) * .3, crop, height, 640, 0, 440, 650);
-        const ink = ctx.createLinearGradient(650, 0, 835, 28);
-        ink.addColorStop(0, "#29473e");
-        ink.addColorStop(1, "#29473e00");
-        ctx.fillStyle = ink;
-        ctx.fillRect(640, 0, 440, 650);
-        ctx.restore();
+        if (includePortrait) {
+          if (!portrait.complete) await portrait.decode();
+          if (!portrait.naturalWidth) throw new Error("画像未加载");
+          const crop = Math.min(portrait.naturalWidth, portrait.naturalHeight * 440 / 650);
+          const height = crop * 650 / 440;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(760, 0);
+          ctx.lineTo(1080, 0);
+          ctx.lineTo(1080, 650);
+          ctx.lineTo(640, 650);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(portrait, (portrait.naturalWidth - crop) / 2, (portrait.naturalHeight - height) * .3, crop, height, 640, 0, 440, 650);
+          const ink = ctx.createLinearGradient(650, 0, 835, 28);
+          ink.addColorStop(0, "#29473e");
+          ink.addColorStop(1, "#29473e00");
+          ctx.fillStyle = ink;
+          ctx.fillRect(640, 0, 440, 650);
+          ctx.restore();
+        }
       } catch {
         // Keep the landscape card available when a portrait cannot be loaded.
       }
@@ -368,6 +388,16 @@
     save();
     showHome();
   });
+  portraitSwitches.forEach((input) => input.addEventListener("change", () => {
+    showPortraits = input.checked;
+    try {
+      localStorage.setItem(portraitPreferenceKey, String(showPortraits));
+    } catch {
+      // Keep both switches synchronized for this visit.
+    }
+    applyPortraitPreference();
+  }));
+  applyPortraitPreference();
   get("share").addEventListener("click", downloadResult);
   if (answers.some((answer) => answer !== null)) {
     set("start", answers.every((answer) => answer !== null) ? "查看结果 →" : "继续答题 →");

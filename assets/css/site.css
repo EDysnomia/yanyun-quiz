@@ -128,6 +128,17 @@ em { color: var(--red); font-style: normal; }
 .cover-art img { aspect-ratio: 4 / 5.25; object-position: 57% 59%; }
 .cover-art figcaption { inset: auto 4% 9% auto; border: 1px solid var(--red); color: var(--red); padding: 6px 10px; transform: rotate(6deg); text-align: center; font-weight: 700; letter-spacing: .08em; }
 .cover-note { grid-column: 1 / -1; color: var(--muted); font-size: .84rem; border-top: 1px solid var(--line); padding-top: 16px; }
+.cover-note, .result-tools { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; }
+.result-toolbar { flex-wrap: wrap; }
+.portrait-switch { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; color: var(--green); font-size: .88rem; white-space: nowrap; }
+.portrait-switch input { appearance: none; position: relative; width: 36px; height: 20px; flex: 0 0 auto; margin: 0; border: 1px solid #747b69; border-radius: 12px; background: var(--panel); cursor: pointer; }
+.portrait-switch input::before { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: #626958; }
+.portrait-switch input:checked { background: var(--green); border-color: var(--green); }
+.portrait-switch input:checked::before { left: 19px; background: var(--panel); }
+#result.landscape-only .portrait-panel { display: none; }
+#result.landscape-only .poster { grid-template-rows: auto; }
+#result.landscape-only .poster-copy { grid-row: 1; justify-self: center; width: min(100%, 760px); }
+#result.landscape-only .secondary-heading { padding-inline: 20px; }
 .reading { max-width: 990px; margin-block: 36px 56px; padding: clamp(4px, 4vw, 48px); border: 0; background: none; }
 .reading h1 { font-size: clamp(2.45rem, 6vw, 4.35rem); margin-block: 18px 27px; }
 .intro-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }

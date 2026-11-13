@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#f5f0e4">
   <meta name="description" content="回答三十道日常情境题，看看你与哪位燕云故人的处事方式最相近。">
   <title>燕云故人｜燕云十六声人物匹配</title>
-  <link rel="stylesheet" href="./assets/css/site.css?v=6">
+  <link rel="stylesheet" href="./assets/css/site.css?v=7">
   <script defer src="./assets/js/questions.js?v=4"></script>
   <script defer src="./assets/js/characters.js"></script>
   <script defer src="./assets/js/readouts.js"></script>
   <script defer src="./assets/js/portraits.js"></script>
-  <script defer src="./assets/js/app.js?v=6"></script>
+  <script defer src="./assets/js/app.js?v=7"></script>
 </head>
 <body>
   <a class="skip" href="#main">跳到主要内容</a>
@@ -30,7 +30,10 @@
         <div class="stats"><span><b>34</b> 位故人</span><span><b>30</b> 道情境</span><span><b>6</b> 项倾向</span></div>
       </div>
       <figure class="cover-art"><div class="art-orbit" aria-hidden="true"></div><div class="art-window"><img src="./assets/images/jianghu.webp" alt="戴斗笠的旅人立于山崖，远望云雾中的江河" fetchpriority="high"></div><figcaption>山河远阔<br>故人有期</figcaption></figure>
-      <p class="cover-note">答案保存在当前浏览器。结果呈现你本次作答与人物画像的相似程度。</p>
+      <div class="cover-note">
+        <p>答案保存在当前浏览器。结果呈现你本次作答与人物画像的相似程度。</p>
+        <label class="portrait-switch"><input type="checkbox" role="switch" data-portrait-switch>AI人物图开关</label>
+      </div>
     </section>
     <section id="intro" class="reading panel" hidden aria-labelledby="intro-title">
       <button class="quiet" id="intro-back">← 返回首页</button>
@@ -56,8 +59,14 @@
         </form>
       </div>
     </section>
-    <section id="result" hidden aria-labelledby="hero-name">
-      <div class="toolbar"><p class="eyebrow"><span class="index-mark">叁</span> 你的江湖档案</p><button class="quiet" id="result-home">返回首页</button></div>
+    <section id="result" class="landscape-only" hidden aria-labelledby="hero-name">
+      <div class="toolbar result-toolbar">
+        <p class="eyebrow"><span class="index-mark">叁</span> 你的江湖档案</p>
+        <div class="result-tools">
+          <label class="portrait-switch"><input type="checkbox" role="switch" data-portrait-switch>AI人物图开关</label>
+          <button class="quiet" id="result-home">返回首页</button>
+        </div>
+      </div>
       <article class="poster">
         <div class="poster-copy">
           <p id="hero-region" class="eyebrow"></p>
